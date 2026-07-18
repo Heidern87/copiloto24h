@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Copiloto 24h - Dashboard</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #1a1a1a;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00a8ff;
+        }
+
+        .logo span {
+            color: #f1c40f;
+        }
+
+        .version {
+            font-size: 12px;
+            background: #2c3e50;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 8px;
+            color: #bdc3c7;
+        }
+
+        .slogan {
+            font-size: 14px;
+            color: #aaaaaa;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background-color: #1a1a1a;
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid #2d2d2d;
+        }
+
+        .panel-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #00a8ff;
+            margin-bottom: 15px;
+            border-left: 4px solid #00a8ff;
+            padding-left: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            background-color: #262626;
+            border: 1px solid #3d3d3d;
+            border-radius: 6px;
+            color: #ffffff;
+            padding: 12px;
+            font-size: 14px;
+            resize: none;
+            outline: none;
+        }
+
+        textarea:focus {
+            border-color: #00a8ff;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-blue {
+            background-color: #00a8ff;
+            color: white;
+        }
+
+        .btn-blue:hover {
+            background-color: #0097e6;
+        }
+
+        .btn-green {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        .btn-green:hover {
+            background-color: #27ae60;
+        }
+
+        .btn-purple {
+            background-color: #9b59b6;
+            color: white;
+        }
+
+        .btn-purple:hover {
+            background-color: #8e44ad;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group-full {
+            grid-column: span 2;
+        }
+
+        label {
+            font-size: 11px;
+            color: #aaaaaa;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        input[type="text"] {
+            background-color: #262626;
+            border: 1px solid #3d3d3d;
+            border-radius: 6px;
+            color: #ffffff;
+            padding: 10px;
+            font-size: 13px;
+            outline: none;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .alert-box {
+            background-color: #262626;
+            border-left: 4px solid #7f8c8d;
+            padding: 15px;
+            border-radius: 4px;
+            font-size: 14px;
+            line-height: 1.5;
+            min-height: 80px;
+        }
+
+        .alert-box.blue {
+            border-left-color: #3498db;
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+
+        .alert-box.yellow {
+            border-left-color: #f1c40f;
+            background-color: rgba(241, 196, 15, 0.1);
+        }
+
+        .modal-roubo {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(3px);
+
+            /* Centraliza o conteúdo perfeitamente na tela */
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content-roubo {
+            background-color: #1e1e1e;
+            padding: 20px;
+            border: 1px solid #e74c3c;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+
+            /* Limita o tamanho do formulário e cria rolagem interna se necessário */
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            margin: auto;
+        }
+
+        .modal-content-roubo h3 {
+            margin-top: 0;
+            color: #e74c3c;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+            position: sticky;
+            top: 0;
+            background-color: #1e1e1e;
+            z-index: 1;
+        }
+
+        .form-group-roubo {
+            margin-bottom: 12px;
+        }
+
+        .form-group-roubo label {
+            display: block;
+            font-size: 12px;
+            color: #aaa;
+            margin-bottom: 4px;
+        }
+
+        .form-group-roubo input,
+        .form-group-roubo textarea {
+            width: 100%;
+            padding: 8px;
+            background-color: #2d2d2d;
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: #fff;
+            box-sizing: border-box;
+        }
+
+        .form-group-roubo input:focus,
+        .form-group-roubo textarea:focus {
+            border-color: #e74c3c;
+            outline: none;
+        }
+
+        .btn-modal-roubo {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .btn-modal-roubo:hover {
+            background-color: #c0392b;
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #aaa;
+            z-index: 2;
+        }
+
+        .close-modal:hover {
+            color: #fff;
+        }
+
+        /* Customização da barra de rolagem interna para ficar elegante */
+        .modal-content-roubo::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .modal-content-roubo::-webkit-scrollbar-track {
+            background: #1e1e1e;
+        }
+
+        .modal-content-roubo::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 3px;
+        }
+
+        .modal-content-roubo::-webkit-scrollbar-thumb:hover {
+            background: #e74c3c;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <div class="logo">⚡ Copiloto 24h <span class="version">v2.0 criado por Almir Oliviera</span></div>
+        <div class="slogan">Foco, Agilidade e Precisão</div>
+    </div>
+
+    <div class="container">
+
+        <!-- COLUNA DA ESQUERDA -->
+        <div class="left-column" style="display: flex; flex-direction: column; gap: 20px;">
+
+            <div class="panel">
+                <div class="panel-title">1. Entrada da Máscara</div>
+                <textarea id="mascaraInput" placeholder="Cole aqui a máscara completa..."></textarea>
+                <button class="btn btn-blue" onclick="processarMascara()">Processar e Analisar Dados</button>
+            </div>
+
+            <div class="panel">
+                <div class="panel-title">2. Dados Confirmados</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Protocolo</label>
+                        <input type="text" id="outProtocolo" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Placa</label>
+                        <input type="text" id="outPlaca" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Associado</label>
+                        <input type="text" id="outAssociado" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Prestador Identificado</label>
+                        <input type="text" id="outPrestador" readonly>
+                    </div>
+                    <div class="form-group form-group-full">
+                        <label>Origem (Endereço Completo)</label>
+                        <input type="text" id="outOrigem" readonly>
+                    </div>
+                    <div class="form-group form-group-full">
+                        <label>Destino (Endereço Completo)</label>
+                        <input type="text" id="outDestino" readonly>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- COLUNA DA DIREITA -->
+        <div class="right-column" style="display: flex; flex-direction: column; gap: 20px;">
+
+            <div class="panel">
+                <div class="panel-title">3. TRIAGEM DE REGRAS & COTAS</div>
+                <div id="alertBox" class="alert-box">
+                    Aguardando colagem de dados...
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-title">4. ACESSO RÁPIDO</div>
+                <p style="font-size: 12px; color: #aaa; margin-bottom: 10px;">Clique nos botões abaixo para gerar as
+                    formatações automáticas:</p>
+
+                <button class="btn btn-green" onclick="copiarParaPlanilha()">
+                    📊 COPIAR LINHA PARA PLANILHA
+                </button>
+
+                <button class="btn btn-purple" onclick="copiarParaSGA()">
+                    📝 COPIAR PARA O SGA
+                </button>
+
+                <button onclick="abrirModalRoubo()"
+                    style="background-color: #e74c3c; color: white; width: 100%; padding: 12px; margin-top: 10px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">
+                    🚨 MÁSCARA DE ROUBO/FURTO
+                </button>
+
+                <!-- O BOTÃO DO GOOGLE MAPS VOLTOU AQUI -->
+                <a id="linkGoogleMaps" href="#" target="_blank" style="text-decoration: none;">
+                    <button class="btn" style="background-color: #f1c40f; color: #121212;">
+                        🗺️ VER ROTAS NO GOOGLE MAPS
+                    </button>
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ESTRUTURA DA JANELA (MODAL) -->
+    <div id="modalRoubo" class="modal-roubo">
+        <div class="modal-content-roubo">
+            <span class="close-modal" onclick="fecharModalRoubo()">&times;</span>
+            <h3>🚨 Guia de Roubo / Furto</h3>
+
+            <div class="form-group-roubo">
+                <label>NOME</label>
+                <input type="text" id="rNome" placeholder="Ex: Almir de Oliveira...">
+            </div>
+            <div class="form-group-roubo">
+                <label>PLACA</label>
+                <input type="text" id="rPlaca" placeholder="Ex: ABC1234">
+            </div>
+            <div class="form-group-roubo">
+                <label>CHASSI</label>
+                <input type="text" id="rChassi">
+            </div>
+            <div class="form-group-roubo">
+                <label>COR</label>
+                <input type="text" id="rCor" placeholder="Ex: Vermelha">
+            </div>
+            <div class="form-group-roubo">
+                <label>MODELO / MONTADORA</label>
+                <input type="text" id="rModelo" placeholder="Ex: Volkswagen">
+            </div>
+            <div class="form-group-roubo">
+                <label>LOCAL</label>
+                <input type="text" id="rLocal">
+            </div>
+            <div class="form-group-roubo">
+                <label>HORÁRIO</label>
+                <input type="text" id="rHorario" placeholder="Ex: hoje / 14:30h">
+            </div>
+            <div class="form-group-roubo">
+                <label>TELEFONE</label>
+                <input type="text" id="rTel">
+            </div>
+            <div class="form-group-roubo">
+                <label>BOLETIM DE OCORRÊNCIA (B.O)</label>
+                <input type="text" id="rBo">
+            </div>
+            <div class="form-group-roubo">
+                <label>CHAVE RESERVA?</label>
+                <div style="display: flex; gap: 15px; margin-top: 5px;">
+                    <label
+                        style="display: inline-flex; align-items: center; color: #fff; font-size: 14px; cursor: pointer;">
+                        <input type="radio" name="rChave" value="SIM"
+                            style="width: auto; margin-right: 6px; accent-color: #e74c3c;"> SIM
+                    </label>
+                    <label
+                        style="display: inline-flex; align-items: center; color: #fff; font-size: 14px; cursor: pointer;">
+                        <input type="radio" name="rChave" value="NÃO"
+                            style="width: auto; margin-right: 6px; accent-color: #e74c3c;"> NÃO
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group-roubo">
+                <label>SEGURO / ASSOCIAÇÃO</label>
+                <input type="text" id="rSeguro" placeholder="Ex: GoldCar">
+            </div>
+
+            <button class="btn-modal-roubo" onclick="gerarEcopiarRoubo()">📋 COPIAR MÁSCARA</button>
+        </div>
+    </div>
+
+    <!-- SEÇÃO DO JAVASCRIPT ISOLADO CORRETAMENTE -->
+    <script>
+        // Banco de dados mapeado com chaves limpas para busca precisa
+        const REGRAS_SEGURADORAS = {
+            "PREVBAHIA": { nome: "PREV BAHIA", limiteKm: 400, servicos: "2 serviços no total (Reboque ou SOS, independente do tipo).", cor: "blue" },
+            "PROTESAUTO": { nome: "PROTESAUTO", limiteKm: 500, servicos: "2 reboques (para panes diferentes) + 1 SOS.", cor: "blue" },
+            "CONFIAUTO": { nome: "CONFIAUTO", limiteKm: 500, servicos: "2 reboques (para panes diferentes) + 1 SOS. *Troca de Pneu somente dentro de salvador, o step em boas condições para a troca.", cor: "blue" },
+            "HIPERCAR": { nome: "HIPERCAR", limiteKm: 300, servicos: "2 reboques (para panes diferentes) + 1 SOS.", cor: "blue" },
+            "GOLDCAR": { nome: "GOLDCAR", limiteKm: 400, servicos: "2 reboques (para panes diferentes) + 1 SOS.", cor: "blue" },
+            "CLUBCAR": { nome: "CLUB CAR", limiteKm: 100, servicos: "1 reboque + 1 SOS", cor: "blue" },
+            "NORDESTE": { nome: "NORDESTE", limiteKm: 300, servicos: "1 reboque + 1 SOS", cor: "yellow" },
+            "TOTTALBAHIA": { nome: "TOTTAL BAHIA", limiteKm: 300, servicos: "1 reboque + 1 SOS", cor: "blue" },
+            "IMPACTO": { nome: "IMPACTO", limiteKm: "Ver no sistema (300 a 1000KMs)", servicos: "1 SOS e 1 reboque a cada 30 dias, com contagem de uso independente entre eles.", cor: "yellow" },
+            "RT": { nome: "RT", limiteKm: "Variável", servicos: "4 Serviços por ano", cor: "blue" }
+        };
+
+        function processarMascara() {
+            try {
+                const texto = document.getElementById('mascaraInput').value;
+                if (!texto) return alert("Por favor, cole a máscara antes.");
+
+                const obterCampo = (regex) => {
+                    const match = texto.match(regex);
+                    return match ? match[1].trim() : '';
+                };
+
+                // 1. IDENTIFICAÇÃO DA SEGURADORA NO CABEÇALHO (SUA SUGESTÃO)
+                let seguradoraTextoExtraido = "";
+                const matchCabecalho = texto.match(/CENTRAL\s+ASSISTÊNCIA\s+24H\s*-\s*([^*:\n]+)/i);
+
+                if (matchCabecalho) {
+                    seguradoraTextoExtraido = matchCabecalho[1].toUpperCase().replace(/\s+/g, '').replace(/[*_]/g, '').trim();
+                }
+
+                let chaveIdentificada = null;
+
+                if (seguradoraTextoExtraido) {
+                    for (let chave in REGRAS_SEGURADORAS) {
+                        if (seguradoraTextoExtraido.includes(chave) || chave.includes(seguradoraTextoExtraido)) {
+                            chaveIdentificada = chave;
+                            break;
+                        }
+                    }
+                }
+
+                // Se ainda não achou por cabeçalho, faz a busca por varredura genérica no texto limpo
+                if (!chaveIdentificada) {
+                    const textoLimpoParaBusca = texto.toUpperCase().replace(/\s+/g, '');
+                    const chavesOrdenadas = Object.keys(REGRAS_SEGURADORAS).sort((a, b) => b.length - a.length);
+                    for (let chave of chavesOrdenadas) {
+                        if (textoLimpoParaBusca.includes(chave)) {
+                            chaveIdentificada = chave;
+                            break;
+                        }
+                    }
+                }
+
+                // 2. CAPTURA DOS DADOS (BLINDADA CONTRA ERROS SILENCIOSOS)
+                const txtPrestador = obterCampo(/\*PRESTADOR:\*\s*(.*)/) || obterCampo(/PRESTADOR:\s*(.*)/) || "A DEFINIR";
+
+                const dados = {
+                    protocolo: obterCampo(/\*PROTOCOLO:\*\s*(.*)/) || obterCampo(/PROTOCOLO:\s*(.*)/) || "AVULSO",
+                    beneficiario: obterCampo(/\*BENEFICIÁRIO:\*\s*(.*)/) || obterCampo(/NOME:\s*(.*)/) || "NÃO ENCONTRADO",
+                    placa: obterCampo(/\*PLACA:\*\s*(.*)/) || obterCampo(/PLACA:\s*(.*)/) || "S/ PLACA",
+                    veiculo: obterCampo(/\*MODELO\/MONTADORA:\*\s*(.*)/) || obterCampo(/MODELO\/MONTADORA:\s*(.*)/) || obterCampo(/MODELO:\s*(.*)/) || "NÃO INFORMADO",
+                    motivo: obterCampo(/\*MOTIVO:\*\s*(.*)/) || obterCampo(/MOTIVO DA PANE:\s*(.*)/) || (texto.includes("ROUBO") ? "ROUBO" : "PANE MECANICA"),
+                    prestador: txtPrestador.toUpperCase(),
+                    origem: obterCampo(/\*ORIGEM:\*\s*([^]*?)(?=\*DESTINO:|$)/).replace(/REF:/gi, '').trim() || obterCampo(/LOCAL:\s*(.*)/) || "NÃO INFORMADA",
+                    destino: obterCampo(/\*DESTINO:\*\s*([^]*?)(?=\*PRESTADOR:|\*OBS.|$)/).replace(/REF:/gi, '').trim() || "NÃO INFORMADO",
+                    atendente: obterCampo(/\*ATENDENTE:\*\s*(.*)/) || "ALMIR",
+                    data: new Date().toLocaleDateString('pt-BR'),
+
+                    // Correção para não gerar undefined se não achar na máscara
+                    chassi: obterCampo(/CHASSI:\s*(.*)/) || "",
+                    cor: obterCampo(/COR:\s*(.*)/) || "",
+                    horario: obterCampo(/HORÁRIO:\s*(.*)/) || "",
+                    telefone: obterCampo(/TEL:\s*(.*)/) || obterCampo(/TELEFONE:\s*(.*)/) || "",
+                    boletim: obterCampo(/BOLETIM DE OCORRENCIA:\s*(.*)/) || "",
+                    seguradoraNome: chaveIdentificada ? REGRAS_SEGURADORAS[chaveIdentificada].nome : (seguradoraTextoExtraido || "")
+                };
+
+                // 3. EXIBIÇÃO NO PAINEL VISUAL (ALERT BOX)
+                const painelRegras = document.getElementById('alertBox');
+
+                if (chaveIdentificada) {
+                    const regra = REGRAS_SEGURADORAS[chaveIdentificada];
+                    painelRegras.className = `alert-box ${regra.cor}`;
+                    painelRegras.style.borderLeftColor = regra.cor === 'blue' ? '#3498db' : '#f1c40f';
+                    painelRegras.style.backgroundColor = regra.cor === 'blue' ? 'rgba(52, 152, 219, 0.1)' : 'rgba(241, 196, 15, 0.1)';
+                    painelRegras.innerHTML = `
+                <div style="font-size: 15px; font-weight: bold; margin-bottom: 5px;">🛡️ REGRA ATIVA: ${regra.nome}</div>
+                <div><strong>Limite de KM:</strong> ${regra.limiteKm}</div>
+                <div><strong>Cota de Utilização:</strong> ${regra.servicos}</div>
+            `;
+                } else if (seguradoraTextoExtraido) {
+                    painelRegras.className = 'alert-box';
+                    painelRegras.style.borderLeftColor = '#e74c3c';
+                    painelRegras.style.backgroundColor = 'rgba(231, 76, 60, 0.1)';
+                    painelRegras.innerHTML = `
+                <div style="font-size: 15px; font-weight: bold; color: #e74c3c; margin-bottom: 5px;">⚠️ SEGURADORA NÃO CADASTRADA</div>
+                <div>O cabeçalho indicou o termo <strong>"${seguradoraTextoExtraido}"</strong>, mas ele não possui regras registradas.</div>
+                <div style="margin-top: 5px; font-size: 12px; color: #aaa;">💡 Cadastre este termo no código para ativar alertas automáticos.</div>
+            `;
+                } else {
+                    painelRegras.className = 'alert-box';
+                    painelRegras.style.borderLeftColor = '#7f8c8d';
+                    painelRegras.style.backgroundColor = '#262626';
+                    painelRegras.innerHTML = `⚠️ Nenhuma seguradora identificada. Dados processados de forma genérica.`;
+                }
+
+                // 4. ALIMENTAÇÃO DOS INPUTS NA TELA
+                document.getElementById('outProtocolo').value = dados.protocolo;
+                document.getElementById('outPlaca').value = dados.placa;
+                document.getElementById('outAssociado').value = dados.beneficiario;
+                document.getElementById('outPrestador').value = dados.prestador;
+                document.getElementById('outOrigem').value = dados.origem;
+                document.getElementById('outDestino').value = dados.destino;
+
+                // 5. CONFIGURAÇÃO DO GOOGLE MAPS
+                const urlGoogleMaps = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(dados.origem)}&destination=${encodeURIComponent(dados.destino)}`;
+                document.getElementById('linkGoogleMaps').href = urlGoogleMaps;
+
+                // Salva globalmente para as funções de cópia
+                window.dadosProcessados = dados;
+
+            } catch (erro) {
+                console.error(erro);
+                alert("Ocorreu um erro ao processar os campos desta máscara. Certifique-se de que os dados estão completos.");
+            }
+        }
+
+        function copiarParaPlanilha() {
+            if (!window.dadosProcessados) return alert("Processe uma máscara primeiro!");
+            const d = window.dadosProcessados;
+            const linhaPlanilha = `${d.data}\t${d.beneficiario}\t${d.veiculo}\t${d.placa}\t${d.origem}\t${d.destino}\tREBOQUE LEVE\t${d.prestador}\t0.00\t0.00\t${d.motivo}`;
+            navigator.clipboard.writeText(linhaPlanilha);
+            alert("🚀 Linha copiada! Vá na sua planilha, selecione a célula da 'Data' e dê Ctrl+V.");
+        }
+
+        function copiarParaSGA() {
+            if (!window.dadosProcessados) return alert("Processe uma máscara primeiro!");
+            const d = window.dadosProcessados;
+            const blocoSGA = `GUINCHO SOLICITADO: ${d.data}\nORIGEM: ${d.origem}\nDESTINO: ${d.destino}\nPLACA: ${d.placa}\nATENDENTE: ${d.atendente}\nPRESTADOR: ${d.prestador}`;
+            navigator.clipboard.writeText(blocoSGA);
+            alert("📝 Bloco de texto do SGA copiado!");
+        }
+
+        // NOVA FUNÇÃO: COPIAR GUIA DE ROUBO PARA OS GRUPOS DE TELEGRAM/WHATSAPP
+        function copiarGuiaRoubo() {
+            if (!window.dadosProcessados) return alert("Processe uma máscara primeiro!");
+            const d = window.dadosProcessados;
+
+            const textoRoubo = `*🚨ATENÇÃO ROUBO🚨*\n\n` +
+                `NOME: ${d.beneficiario}\n\n` +
+                `PLACA: ${d.placa}\n\n` +
+                `CHASSI: ${d.chassi}\n\n` +
+                `COR: ${d.cor}\n\n` +
+                `MODELO: ${d.veiculo}\n\n` +
+                `LOCAL: ${d.origem}\n\n` +
+                `HORÁRIO: ${d.horario}\n\n` +
+                `TEL: ${d.telefone}\n\n` +
+                `BOLETIM DE OCORRENCIA: ${d.boletim}\n\n` +
+                `CHAVE RESERVA: ${d.chaveReserva}\n\n` +
+                `*SEGURADORA*`;
+
+            navigator.clipboard.writeText(textoRoubo);
+            alert("🚨 Guia de Roubo copiado com sucesso!");
+        }
+
+        // Função para abrir o formulário manual de roubo
+        function abrirModalRoubo() {
+            // Reseta a seleção dos Radio Buttons de chave reserva
+            const radios = document.getElementsByName('rChave');
+            radios[0].checked = false;
+            radios[1].checked = false;
+
+            if (window.dadosProcessados) {
+                const d = window.dadosProcessados;
+
+                document.getElementById('rNome').value = (d.beneficiario !== "NÃO ENCONTRADO") ? d.beneficiario : "";
+                document.getElementById('rPlaca').value = (d.placa !== "S/ PLACA") ? d.placa : "";
+                document.getElementById('rChassi').value = d.chassi || "";
+                document.getElementById('rCor').value = d.cor || "";
+                document.getElementById('rModelo').value = (d.veiculo !== "NÃO INFORMADO") ? d.veiculo : "";
+                document.getElementById('rLocal').value = (d.origem !== "NÃO INFORMADA") ? d.origem : "";
+                document.getElementById('rHorario').value = d.horario || "";
+                document.getElementById('rTel').value = d.telefone || "";
+                document.getElementById('rBo').value = d.boletim || "";
+                document.getElementById('rSeguro').value = d.seguradoraNome || "";
+            } else {
+                document.getElementById('rNome').value = "";
+                document.getElementById('rPlaca').value = "";
+                document.getElementById('rChassi').value = "";
+                document.getElementById('rCor').value = "";
+                document.getElementById('rModelo').value = "";
+                document.getElementById('rLocal').value = "";
+                document.getElementById('rHorario').value = "";
+                document.getElementById('rTel').value = "";
+                document.getElementById('rBo').value = "";
+                document.getElementById('rSeguro').value = "";
+            }
+
+            document.getElementById('modalRoubo').style.display = 'flex';
+        }
+
+        function gerarEcopiarRoubo() {
+            const nome = document.getElementById('rNome').value || '';
+            const placa = document.getElementById('rPlaca').value || '';
+            const chassi = document.getElementById('rChassi').value || '';
+            const cor = document.getElementById('rCor').value || '';
+            const modelo = document.getElementById('rModelo').value || '';
+            const local = document.getElementById('rLocal').value || '';
+            const horario = document.getElementById('rHorario').value || '';
+            const tel = document.getElementById('rTel').value || '';
+            const bo = document.getElementById('rBo').value || '';
+            const seguro = document.getElementById('rSeguro').value || 'RT RASTREAMENTO';
+
+            // Captura qual rádio está selecionado (SIM ou NÃO)
+            const radios = document.getElementsByName('rChave');
+            let chaveReserva = "";
+            for (let i = 0; i < radios.length; i++) {
+                if (radios[i].checked) {
+                    chaveReserva = radios[i].value;
+                    break;
+                }
+            }
+
+            const textoFormatado = `*🚨ATENÇÃO ROUBO🚨*\n\n` +
+                `NOME: ${nome}\n\n` +
+                `PLACA: ${placa}\n\n` +
+                `CHASSI: ${chassi}\n\n` +
+                `COR: ${cor}\n\n` +
+                `MODELO: ${modelo}\n\n` +
+                `LOCAL: ${local}\n\n` +
+                `HORÁRIO: ${horario}\n\n` +
+                `TEL: ${tel}\n\n` +
+                `BOLETIM DE OCORRENCIA: ${bo}\n\n` +
+                `CHAVE RESERVA: ${chaveReserva}\n\n` +
+                `*${seguro.toUpperCase()}*`;
+
+            navigator.clipboard.writeText(textoFormatado);
+            alert("🚨 Guia de Roubo copiado sem erros!");
+            fecharModalRoubo();
+        }
+
+        // Função para fechar a janela
+        function fecharModalRoubo() {
+            document.getElementById('modalRoubo').style.display = 'none';
+        }
+
+        // Fecha o modal caso clique fora da caixinha preta
+        window.onclick = function (event) {
+            const modal = document.getElementById('modalRoubo');
+            if (event.target == modal) {
+                fecharModalRoubo();
+            }
+        }
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then((reg) => console.log('Service Worker registrado com sucesso!', reg.scope))
+                    .catch((err) => console.error('Erro ao registrar o Service Worker:', err));
+            });
+        }
+    </script>
+</body>
+
+</html>
