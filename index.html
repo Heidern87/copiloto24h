@@ -321,6 +321,33 @@
         .modal-content-roubo::-webkit-scrollbar-thumb:hover {
             background: #e74c3c;
         }
+
+        /* Notificação elegante e discreta no rodapé */
+        .toast {
+            visibility: hidden;
+            min-width: 280px;
+            background-color: #28a745;
+            /* Cor verde de sucesso */
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 12px 24px;
+            position: fixed;
+            z-index: 9999;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            font-size: 15px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            opacity: 0;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .toast.show {
+            visibility: visible;
+            opacity: 1;
+        }
     </style>
 </head>
 
@@ -617,7 +644,7 @@
             const d = window.dadosProcessados;
             const linhaPlanilha = `${d.data}\t${d.beneficiario}\t${d.veiculo}\t${d.placa}\t${d.origem}\t${d.destino}\tREBOQUE LEVE\t${d.prestador}\t0.00\t0.00\t${d.motivo}`;
             navigator.clipboard.writeText(linhaPlanilha);
-            alert("🚀 Linha copiada! Vá na sua planilha, selecione a célula da 'Data' e dê Ctrl+V.");
+            mostrarNotificacao("🚀 Linha copiada! Vá na sua planilha e dê Ctrl+V.");
         }
 
         function copiarParaSGA() {
@@ -625,7 +652,7 @@
             const d = window.dadosProcessados;
             const blocoSGA = `GUINCHO SOLICITADO: ${d.data}\nORIGEM: ${d.origem}\nDESTINO: ${d.destino}\nPLACA: ${d.placa}\nATENDENTE: ${d.atendente}\nPRESTADOR: ${d.prestador}`;
             navigator.clipboard.writeText(blocoSGA);
-            alert("📝 Bloco de texto do SGA copiado!");
+            mostrarNotificacao("📝 Bloco de texto do SGA copiado!");
         }
 
         // NOVA FUNÇÃO: COPIAR GUIA DE ROUBO PARA OS GRUPOS DE TELEGRAM/WHATSAPP
@@ -647,7 +674,23 @@
                 `*SEGURADORA*`;
 
             navigator.clipboard.writeText(textoRoubo);
-            alert("🚨 Guia de Roubo copiado com sucesso!");
+            mostrarNotificacao("🚨 Guia de Roubo copiado com sucesso!");
+        }
+
+        // Cole esta função auxiliar logo abaixo delas no <script>
+        function mostrarNotificacao(mensagem) {
+            let toast = document.getElementById("toast-notificacao");
+            if (!toast) {
+                toast = document.createElement("div");
+                toast.id = "toast-notificacao";
+                document.body.appendChild(toast);
+            }
+            toast.textContent = mensaje;
+            toast.className = "toast show";
+
+            setTimeout(() => {
+                toast.className = toast.className.replace("show", "");
+            }, 2000);
         }
 
         // Função para abrir o formulário manual de roubo
