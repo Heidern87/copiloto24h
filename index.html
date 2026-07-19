@@ -240,10 +240,32 @@
             color: #e74c3c;
             border-bottom: 1px solid #333;
             padding-bottom: 10px;
+            /* Mantém o título grudado */
             position: sticky;
             top: 0;
             background-color: #1e1e1e;
             z-index: 1;
+            /* Garante que ele ocupe toda a largura para esconder os inputs que passam por baixo */
+            margin-left: -5px;
+            margin-right: -5px;
+            padding-left: 5px;
+        }
+
+        /* 🚀 NOVA REGRA: Congela o botão de fechar ('X') no topo junto com o título */
+        .modal-content-roubo .close,
+        .modal-content-roubo [onclick*="close"],
+        .modal-content-roubo [onclick*="fechar"] {
+            position: sticky !important;
+            top: 0px;
+            /* Alinha na mesma linha do título */
+            z-index: 2;
+            /* Fica por cima do fundo do h3 */
+            float: right;
+            /* Mantém ele na direita */
+            background-color: #1e1e1e;
+            /* Mesma cor de fundo para não ficar transparente */
+            padding-bottom: 10px;
+            /* Alinha com a borda inferior do h3 */
         }
 
         .form-group-roubo {
